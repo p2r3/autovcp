@@ -1,2 +1,2 @@
-bun build --compile --minify --sourcemap ./main.js --outfile autovcp
+bun build --compile --target=bun-linux-x64-baseline --minify --sourcemap ./main.js --outfile autovcp_linux
 bun build --compile --target=bun-windows-x64-baseline --minify --sourcemap ./main.js --outfile autovcp
