@@ -6,6 +6,8 @@ let routineRunning = false;
 
 function setup (command, socket) {
 
+  routineRunning = true;
+
   console.log(`Enabling extra console spew...`);
   socket.write("developer 1;ui_gameui_debug 1\n");
 
@@ -16,7 +18,6 @@ function setup (command, socket) {
   socket.write("hideconsole\n");
 
   setTimeout(function () {
-    routineRunning = true;
     console.log(`Running input command "${command}"...\n`);
     socket.write(command + "\n");
   }, 1000);
@@ -27,18 +28,19 @@ function dataHandler (socket, data) {
 
   consoleOutput += data.toString();
 
-  if (consoleOutput.includes("[autovcp]")) {
+  if (!routineRunning) {
 
-    const command = consoleOutput.slice(0, consoleOutput.indexOf("[autovcp]")).split("\r\n").pop();
-    consoleOutput = "";
+    if (consoleOutput.includes("[autovcp]")) {
+      const command = consoleOutput.slice(0, consoleOutput.indexOf("[autovcp]")).split("\r\n").pop();
+      consoleOutput = "";
 
-    console.log("Input received, running setup...");
-    setup(command, socket);
+      console.log("Input received, running setup...");
+      setup(command, socket);
+      return;
+    }
+
     return;
-
   }
-
-  if (!routineRunning) return;
 
   if (consoleOutput.includes("state = 3")) {
     console.log("Encountered first trigger.");
